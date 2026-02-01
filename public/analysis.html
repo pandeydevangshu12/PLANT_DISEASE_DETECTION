@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaf Doctor | Analyzer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <style>
+        :root {
+            --primary: #00ff88;
+            --dark: #0a0a0a;
+            --glass: rgba(255, 255, 255, 0.05);
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--dark);
+            color: white;
+            display: flex;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        /* --- Navbar (Minimal) --- */
+        nav {
+            position: absolute;
+            top: 20px; left: 40px;
+            z-index: 100;
+            display: flex;
+            gap: 20px;
+        }
+        nav a { color: white; text-decoration: none; font-weight: bold; opacity: 0.7; transition: 0.3s; }
+        nav a:hover { opacity: 1; color: var(--primary); }
+
+        /* --- Layout --- */
+        .container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* LEFT: Upload & Preview */
+        .upload-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            border-right: 1px solid rgba(255,255,255,0.1);
+            position: relative;
+        }
+
+        /* Animated Background Blob */
+        .blob {
+            position: absolute;
+            width: 500px; height: 500px;
+            background: radial-gradient(circle, rgba(0,255,136,0.1) 0%, transparent 70%);
+            z-index: -1;
+            animation: pulse 5s infinite ease-in-out;
+        }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+
+        .upload-box {
+            width: 400px;
+            height: 300px;
+            border: 2px dashed rgba(255,255,255,0.2);
+            border-radius: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: 0.3s;
+            background: rgba(0,0,0,0.3);
+        }
+
+        .upload-box:hover { border-color: var(--primary); box-shadow: 0 0 30px rgba(0,255,136,0.1); }
+
+        .preview-media { width: 100%; height: 100%; object-fit: cover; display: none; }
+        .placeholder { text-align: center; color: #666; pointer-events: none; }
+        .placeholder span { font-size: 3rem; display: block; margin-bottom: 10px; }
+
+        input[type="file"] { position: absolute; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+
+        .scan-btn {
+            margin-top: 2rem;
+            background: var(--primary);
+            color: black;
+            border: none;
+            padding: 1rem 3rem;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: 0.3s;
+            opacity: 0.5; pointer-events: none;
+        }
+
+        .scan-btn.active { opacity: 1; pointer-events: all; box-shadow: 0 0 20px var(--primary); }
+        .scan-btn:hover { transform: scale(1.05); }
+
+        /* RIGHT: Results */
+        .result-section {
+            flex: 1;
+            padding: 4rem;
+            overflow-y: auto;
+            background: #0f0f0f;
+        }
+
+        .result-content {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: 0.5s;
+        }
+
+        .result-content.show { opacity: 1; transform: translateY(0); }
+
+        h2 { font-size: 2.5rem; margin-bottom: 2rem; color: white; }
+        
+        /* Markdown Styles */
+        .markdown-body h1, .markdown-body h2 { color: var(--primary); margin-top: 1.5rem; border-bottom: 1px solid #333; padding-bottom: 0.5rem; }
+        .markdown-body strong { color: var(--primary); }
+        .markdown-body ul { padding-left: 1rem; color: #ccc; line-height: 1.8; }
+        .markdown-body li { margin-bottom: 0.5rem; }
+
+        /* Loading Animation */
+        .loader {
+            display: none;
+            border: 4px solid rgba(255,255,255,0.1);
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            width: 40px; height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="dashboard.html">← Back to Dashboard</a>
+    </nav>
+
+    <div class="container">
+        <div class="upload-section">
+            <div class="blob"></div>
+            <h1>Upload Specimen</h1>
+            <p style="color: #666; margin-bottom: 2rem;">Support: .jpg, .png, .mp4</p>
+
+            <div class="upload-box">
+                <input type="file" id="fileInput" accept="image/*,video/*">
+                <div class="placeholder" id="placeholder">
+                    <span>📂</span>
+                    Click or Drag File
+                </div>
+                <img id="imgPreview" class="preview-media">
+                <video id="videoPreview" class="preview-media" controls></video>
+            </div>
+
+            <button class="scan-btn" id="analyzeBtn">INITIATE SCAN</button>
+            <div class="loader" id="loader"></div>
+        </div>
+
+        <div class="result-section">
+            <div id="initialMsg" style="color: #333; margin-top: 30%;">
+                <h1>Awaiting Input...</h1>
+                <p>Upload a file to begin AI diagnosis.</p>
+            </div>
+            
+            <div id="resultContent" class="result-content">
+                <h2>Diagnostic Report</h2>
+                <div id="markdownOutput" class="markdown-body"></div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { supabase, checkAuth } from './config.js';
+
+        // 1. SECURITY CHECK: Ensure user is logged in
+        const user = await checkAuth(); 
+        console.log("Logged in as:", user.email);
+
+        const fileInput = document.getElementById('fileInput');
+        const imgPreview = document.getElementById('imgPreview');
+        const videoPreview = document.getElementById('videoPreview');
+        const placeholder = document.getElementById('placeholder');
+        const analyzeBtn = document.getElementById('analyzeBtn');
+        const loader = document.getElementById('loader');
+        const resultContent = document.getElementById('resultContent');
+        const initialMsg = document.getElementById('initialMsg');
+        const markdownOutput = document.getElementById('markdownOutput');
+
+        let fileToUpload = null;
+
+        // Handle File Selection
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            fileToUpload = file;
+            const url = URL.createObjectURL(file);
+            
+            placeholder.style.display = 'none';
+            analyzeBtn.classList.add('active');
+            
+            if (file.type.startsWith('image/')) {
+                imgPreview.src = url;
+                imgPreview.style.display = 'block';
+                videoPreview.style.display = 'none';
+            } else {
+                videoPreview.src = url;
+                videoPreview.style.display = 'block';
+                imgPreview.style.display = 'none';
+            }
+        });
+
+        // Handle Analysis & Database Saving
+        analyzeBtn.addEventListener('click', async () => {
+            if (!fileToUpload) return;
+
+            // UI State: Loading
+            analyzeBtn.style.display = 'none';
+            loader.style.display = 'block';
+            initialMsg.style.display = 'none';
+            resultContent.classList.remove('show');
+
+            const formData = new FormData();
+            formData.append('plantMedia', fileToUpload);
+
+            try {
+                // 1. Send file to our Local Backend (which talks to Gemini)
+                const res = await fetch('/analyze', { method: 'POST', body: formData });
+                const data = await res.json();
+
+                if (data.error) throw new Error(data.error);
+
+                // 2. Render the AI Result (Markdown -> HTML)
+                markdownOutput.innerHTML = marked.parse(data.analysis);
+                
+                // 3. SAVE TO SUPABASE (Background Process)
+                const { error: dbError } = await supabase
+                    .from('scans')
+                    .insert([
+                        { 
+                            user_id: user.id, 
+                            diagnosis: data.analysis 
+                        }
+                    ]);
+                
+                if (dbError) {
+                    console.error("Database Save Failed:", dbError);
+                } else {
+                    console.log("Diagnosis saved to history!");
+                }
+
+                // 4. Update UI: Success
+                loader.style.display = 'none';
+                analyzeBtn.style.display = 'block';
+                analyzeBtn.innerText = "SCAN SAVED & READY";
+                resultContent.classList.add('show');
+
+            } catch (err) {
+                alert("Error: " + err.message);
+                loader.style.display = 'none';
+                analyzeBtn.style.display = 'block';
+                analyzeBtn.innerText = "INITIATE SCAN";
+            }
+        });
+    </script>
+</body>
+</html>

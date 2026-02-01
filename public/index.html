@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaf Doctor | AI AgriTech</title>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #00ff88;
+            --dark: #0a0a0a;
+            --glass: rgba(255, 255, 255, 0.05);
+        }
+        
+        * { box-sizing: border-box; margin: 0; padding: 0; scroll-behavior: smooth; }
+        
+        body {
+            background-color: var(--dark);
+            color: white;
+            font-family: 'Outfit', sans-serif;
+            overflow-x: hidden;
+        }
+
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 1.5rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(10, 10, 10, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .logo { font-size: 1.5rem; font-weight: 700; color: var(--primary); letter-spacing: 1px; }
+        
+        .nav-links { display: flex; gap: 2rem; }
+        .nav-links a { text-decoration: none; color: #aaa; transition: 0.3s; font-size: 0.9rem; }
+        .nav-links a:hover { color: var(--primary); }
+
+        .cta-btn {
+            background: var(--primary);
+            color: black;
+            padding: 0.8rem 1.5rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .cta-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+        }
+
+        .hero {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: radial-gradient(circle at center, #1a2e24 0%, #0a0a0a 70%);
+            position: relative;
+        }
+
+        .hero h1 {
+            font-size: 5rem;
+            line-height: 1;
+            margin-bottom: 1rem;
+            background: linear-gradient(to right, #fff, #888);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero span { color: var(--primary); -webkit-text-fill-color: var(--primary); }
+
+        .hero p { color: #888; max-width: 600px; margin-bottom: 2rem; font-size: 1.2rem; }
+
+        .section { padding: 5rem 10%; scroll-margin-top: 80px; }
+        .section-title { font-size: 2.5rem; margin-bottom: 3rem; text-align: center; }
+        .section-title span { border-bottom: 3px solid var(--primary); }
+
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; }
+
+        .card {
+            background: var(--glass);
+            padding: 2rem;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: 0.3s;
+        }
+
+        .card:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-10px);
+            border-color: var(--primary);
+        }
+
+        .card h3 { color: var(--primary); margin-bottom: 1rem; font-size: 1.5rem; }
+        .card p { color: #ccc; line-height: 1.6; }
+
+        /* --- Footer --- */
+        footer {
+            text-align: center;
+            padding: 2rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            color: #666;
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="logo">LEAF DOCTOR</div>
+        <div class="nav-links">
+            <a href="#about">About</a>
+            <a href="#services">Services</a>
+            <a href="#contact">Contact</a>
+        </div>
+        <a href="analysis.html" class="cta-btn">Launch App 🚀</a>
+    </nav>
+
+    <section class="hero">
+        <div data-aos="fade-up" data-aos-duration="1000">
+            <h1>The Future of <br> <span>Plant Health</span></h1>
+            <p>AI-powered diagnosis for your crops in milliseconds. Upload a video, get a cure.</p>
+            <a href="analysis.html" class="cta-btn" style="padding: 1rem 2.5rem; font-size: 1.2rem;">Analyze Now</a>
+        </div>
+    </section>
+
+    <section id="about" class="section">
+        <h2 class="section-title" data-aos="fade-right"><span>What We Do</span></h2>
+        <div class="grid">
+            <div class="card" data-aos="fade-up" data-aos-delay="100">
+                <h3>🔍 AI Diagnosis</h3>
+                <p>We use Gemini 1.5 Flash to analyze leaf textures, spots, and discoloration in real-time video feeds.</p>
+            </div>
+            <div class="card" data-aos="fade-up" data-aos-delay="200">
+                <h3>🌱 Crop Protection</h3>
+                <p>Early detection allows for targeted treatment, saving up to 40% of crop yields from common blights.</p>
+            </div>
+            <div class="card" data-aos="fade-up" data-aos-delay="300">
+                <h3>⚡ Instant Results</h3>
+                <p>No waiting for labs. Get actionable advice on pesticides and organic cures in seconds.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="services" class="section">
+        <h2 class="section-title" data-aos="fade-right"><span>Our Services</span></h2>
+        <div class="grid">
+            <div class="card" data-aos="zoom-in">
+                <h3>Disease Identification</h3>
+                <p>Detects Early Blight, Late Blight, Rust, and 30+ other common pathologies.</p>
+            </div>
+            <div class="card" data-aos="zoom-in" data-aos-delay="100">
+                <h3>Treatment Plans</h3>
+                <p>Get step-by-step chemical and organic treatment recipes generated by AI.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="contact" class="section">
+        <h2 class="section-title" data-aos="fade-right" data-aos-once="false" data-aos-anchor-placement="top-bottom"><span>Contact Us</span></h2>
+        <p style="text-align: center; color: #888;" data-aos="fade-up" data-aos-delay="100" data-aos-once="false" data-aos-anchor-placement="top-bottom">
+            Have questions or need support? Reach out to our team at <a href="mailto:devangshu.pandey2025@vitstudent.ac.in" style="color: var(--primary); text-decoration: underline;">devangshu.pandey2025@vitstudent.ac.in</a>.
+        </p>
+    </section>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init({
+            duration: 800,
+            easing: 'ease-in-out',
+            once: false,
+            mirror: false,
+            offset: 120
+        });
+
+        window.addEventListener('hashchange', () => setTimeout(() => AOS.refresh(), 60));
+        window.addEventListener('load', () => setTimeout(() => AOS.refresh(), 60));
+
+        document.querySelectorAll('nav .nav-links a').forEach(a => {
+            a.addEventListener('click', () => setTimeout(() => AOS.refresh(), 500));
+        });
+    </script>
+</body>
+</html>

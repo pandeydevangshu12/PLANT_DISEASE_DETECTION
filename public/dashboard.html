@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Leaf Doctor | Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        body { background: #0a0a0a; color: white; font-family: 'Outfit', sans-serif; padding: 2rem; }
+        
+        nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 3rem; }
+        .logo { color: #00ff88; font-weight: bold; font-size: 1.5rem; }
+        .user-info { display: flex; gap: 1rem; align-items: center; }
+        .btn-logout { background: transparent; border: 1px solid #333; color: #888; padding: 0.5rem 1rem; border-radius: 20px; cursor: pointer; }
+        .btn-new { background: #00ff88; color: black; text-decoration: none; padding: 0.8rem 2rem; border-radius: 50px; font-weight: bold; }
+
+        .history-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; }
+        
+        .card { 
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); 
+            padding: 1.5rem; border-radius: 16px; transition: 0.3s; height: 250px; overflow: hidden;
+            display: flex; flex-direction: column;
+        }
+        .card:hover { transform: translateY(-5px); border-color: #00ff88; }
+        
+        .date { font-size: 0.8rem; color: #666; margin-bottom: 0.5rem; }
+        .snippet { font-size: 0.9rem; color: #ccc; flex: 1; overflow: hidden; position: relative; }
+        .snippet::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 50px; background: linear-gradient(transparent, #131313); }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="logo">LEAF DOCTOR DASHBOARD</div>
+        <div class="user-info">
+            <span id="userEmail">Loading...</span>
+            <button id="logoutBtn" class="btn-logout">Sign Out</button>
+            <a href="analysis.html" class="btn-new">+ New Scan</a>
+        </div>
+    </nav>
+
+    <h2 style="margin-bottom: 1.5rem;">Recent Scans</h2>
+    <div class="history-grid" id="historyGrid">
+        <p style="color: #666;">Loading history...</p>
+    </div>
+
+    <script type="module">
+        import { supabase, checkAuth } from './config.js';
+
+        // 1. Check Auth & Load User
+        const user = await checkAuth();
+        document.getElementById('userEmail').innerText = user.email;
+
+        // 2. Load History
+        async function loadHistory() {
+            const { data, error } = await supabase
+                .from('scans')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            const grid = document.getElementById('historyGrid');
+            grid.innerHTML = '';
+
+            if (data.length === 0) {
+                grid.innerHTML = '<p style="color: #444;">No scans found. Start a new one!</p>';
+                return;
+            }
+
+            data.forEach(scan => {
+                const date = new Date(scan.created_at).toLocaleDateString();
+                const card = document.createElement('div');
+                card.className = 'card';
+                // Show first 200 chars of diagnosis
+                card.innerHTML = `
+                    <div class="date">${date}</div>
+                    <div class="snippet">${marked.parse(scan.diagnosis)}</div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+        loadHistory();
+
+        // 3. Logout
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            await supabase.auth.signOut();
+            window.location.href = 'login.html';
+        });
+    </script>
+</body>
+</html>
