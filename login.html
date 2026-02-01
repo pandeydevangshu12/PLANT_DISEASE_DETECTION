@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Leaf Doctor | Secure Access</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: #0a0a0a; color: white; font-family: 'Outfit', sans-serif;
+            display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0;
+            overflow: hidden;
+        }
+        .login-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            padding: 3rem; border-radius: 24px; text-align: center;
+            border: 1px solid rgba(255,255,255,0.1);
+            width: 100%; max-width: 400px;
+            box-shadow: 0 0 40px rgba(0, 255, 136, 0.1);
+        }
+        h1 { color: #00ff88; margin-bottom: 0.5rem; }
+        p { color: #888; margin-bottom: 2rem; }
+        
+        input {
+            width: 100%; padding: 1rem; margin-bottom: 1rem;
+            background: rgba(0,0,0,0.5); border: 1px solid #333;
+            color: white; border-radius: 12px; font-family: inherit;
+            box-sizing: border-box; text-align: center;
+        }
+        input:focus { outline: none; border-color: #00ff88; }
+
+        .btn-group { display: flex; gap: 10px; }
+        
+        .btn {
+            border: none; padding: 1rem; border-radius: 50px; font-weight: bold; cursor: pointer;
+            width: 100%; transition: 0.3s; font-size: 1rem;
+        }
+        .btn-primary { background: #00ff88; color: black; }
+        .btn-primary:hover { transform: scale(1.05); box-shadow: 0 0 20px #00ff88; }
+        
+        .btn-secondary { background: transparent; border: 1px solid #333; color: #888; }
+        .btn-secondary:hover { border-color: #00ff88; color: white; }
+
+        .orb { position: absolute; border-radius: 50%; filter: blur(80px); z-index: -1; }
+        .orb-1 { width: 300px; height: 300px; background: #00ff88; top: -100px; left: -100px; opacity: 0.2; }
+        .orb-2 { width: 200px; height: 200px; background: #0088ff; bottom: -50px; right: -50px; opacity: 0.2; }
+    </style>
+</head>
+<body>
+
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+
+    <div class="login-card">
+        <h1>Leaf Doctor</h1>
+        <p>Restricted Access</p>
+        
+        <input type="email" id="email" placeholder="Email (@gmail.com only)">
+        <input type="password" id="password" placeholder="Password">
+        
+        <div class="btn-group">
+            <button id="loginBtn" class="btn btn-primary">Log In</button>
+            <button id="signupBtn" class="btn btn-secondary">Sign Up</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { supabase } from './config.js';
+
+        const emailInput = document.getElementById('email');
+        const passInput = document.getElementById('password');
+        const loginBtn = document.getElementById('loginBtn');
+        const signupBtn = document.getElementById('signupBtn');
+
+        // Helper: Validate Email
+        function validate() {
+            const email = emailInput.value.trim();
+            const pass = passInput.value.trim();
+            
+            if (!email.endsWith('@gmail.com')) {
+                alert('Only @gmail.com accounts are allowed.');
+                return false;
+            }
+            if (pass.length < 6) {
+                alert('Password must be at least 6 characters.');
+                return false;
+            }
+            return { email, pass };
+        }
+
+        // --- LOGIN ACTION ---
+        loginBtn.addEventListener('click', async () => {
+            const creds = validate();
+            if (!creds) return;
+
+            loginBtn.innerText = "Checking...";
+            
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email: creds.email,
+                password: creds.pass
+            });
+
+            if (error) {
+                alert("Login Failed: " + error.message);
+                loginBtn.innerText = "Log In";
+            } else {
+                window.location.href = 'dashboard.html';
+            }
+        });
+
+        // --- SIGN UP ACTION ---
+        signupBtn.addEventListener('click', async () => {
+            const creds = validate();
+            if (!creds) return;
+
+            signupBtn.innerText = "Creating...";
+
+            const { data, error } = await supabase.auth.signUp({
+                email: creds.email,
+                password: creds.pass
+            });
+
+            if (error) {
+                alert("Sign Up Failed: " + error.message);
+                signupBtn.innerText = "Sign Up";
+            } else {
+                alert("Account created! Please check your email to confirm, then Log In.");
+                signupBtn.innerText = "Sign Up";
+            }
+        });
+    </script>
+</body>
+</html>
