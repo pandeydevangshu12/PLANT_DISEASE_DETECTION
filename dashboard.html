@@ -35,7 +35,7 @@
         <div class="user-info">
             <span id="userEmail">Loading...</span>
             <button id="logoutBtn" class="btn-logout">Sign Out</button>
-            <a href="analysis.html" class="btn-new">+ New Scan</a>
+            <a href="/analysis" class="btn-new">+ New Scan</a>
         </div>
     </nav>
 
@@ -83,8 +83,9 @@
         // 3. Logout
         document.getElementById('logoutBtn').addEventListener('click', async () => {
             await supabase.auth.signOut();
-            window.location.href = 'login.html';
+            window.location.href = '/login';
         });
     </script>
 </body>
+
 </html>
